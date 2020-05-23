@@ -8,9 +8,7 @@ did not have a way to submit a crafting request with a ComputerCraft or CC:Tweak
 
 ## Setup
 ### Installation
-Install the program by copying and pasting the code from `startup` in this repository into the file of the same name on your computer. Relative to the minecraft directory, the location where the in-game files for your computer are stored is `~/minecraft/saves/world_name/computer/num_index_of_computer`. I would tell you to use the `pastebin` command within the computer itself, however it no longer works as the pastebin API has since changed.
-
-Additionally, the README.txt file contains the color codes and an example entry. If you wish, you can also add that file to the in-game computer, but it isn't required.
+Install the program by copying and pasting the code from `startup` in this repository into the file of the same name on your computer. Relative to the minecraft directory, the location where the in-game files for your computer are stored is `~/minecraft/saves/world_name/computer/num_index_of_computer`. I would tell you to use the `pastebin` command within the computer itself, however it no longer works as the pastebin API has since changed. That said, the startup script serves to automatically update the main script when the `programs/AE-Autocrafting-Request-System.lua` file is edited on the master branch.
 
 ### Configuring
 When the program first runs it will generate a configuration file called `resources.config` and ask you to add some enteries.
@@ -45,8 +43,6 @@ The configuration can look a little complex so I'll provide an example.
 #                 a redstone signal appears to "halt"
 #                 the system.
 #                 This is a boolean.
-#
-# Refer to README.txt for an example.
 # 
 # In-order for the changes in this configuration file to
 # take effect, the system will need to be rebooted.
