@@ -17,12 +17,13 @@ When the program first runs it will generate a configuration file called `resour
 The configuration can look a little complex so I'll provide an example.
 
 ```
-# ID,DMG,lowThreshhold,COLOR,SIDE
+# ID,DMG,lowThreshhold,COLOR,SIDE,PULSE
 #
-# ID -            The ID of the item. This is a string.
+# ID -            The ID of the item. 
+#                 This is a string.
 #
-# DMG -           The damage value of the item. This is 
-#                 an int.
+# DMG -           The damage value of the item.
+#                 This is an int.
 #
 # lowThreshhold - The minimal amount the AE network will
 #                 try to keep within the system.
@@ -35,28 +36,39 @@ The configuration can look a little complex so I'll provide an example.
 #                 This is an int.
 #
 # SIDE -          The side of the computer that will emit
-#                 a redstone signal on COLOR. This is
-#                 a string.
+#                 a redstone signal on COLOR. 
+#                 This is a string.
+#
+# PULSE -         Controls whether or not the redstone
+#                 signal will pulse in 5 second intervals.
+#                 This is to mitigate a bug in AE where
+#                 a redstone signal appears to "halt"
+#                 the system.
+#                 This is a boolean.
 #
 # Refer to README.txt for an example.
+# 
+# In-order for the changes in this configuration file to
+# take effect, the system will need to be rebooted.
+
 
 # Charged Certus Quartz
-appliedenergistics2:item.ItemMultiMaterial,1,100,16384,left
+appliedenergistics2:item.ItemMultiMaterial,1,100,16384,left,true
 
 # Fluix Crystal
-appliedenergistics2:item.ItemMultiMaterial,7,100,8192,left
+appliedenergistics2:item.ItemMultiMaterial,7,100,8192,left,true
 
 # Logic Processor
-appliedenergistics2:item.ItemMultiMaterial,22,100,4096,left
+appliedenergistics2:item.ItemMultiMaterial,22,100,4096,left,true
 
 # Calculation Processor
-appliedenergistics2:item.ItemMultiMaterial,23,100,2048,left
+appliedenergistics2:item.ItemMultiMaterial,23,100,2048,left,true
 
 # Engineering Processor
-appliedenergistics2:item.ItemMultiMaterial,24,100,1024,left
+appliedenergistics2:item.ItemMultiMaterial,24,100,1024,left,true
 
 # Smooth Stone
-minecraft:stone,0,100,32768,left
+minecraft:stone,0,100,32768,left,false
 ```
 Also, you might of noticed that the value for color is provided as an integer. This being the case here is the full list of possible colors:
 ```
