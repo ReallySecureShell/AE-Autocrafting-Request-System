@@ -22,5 +22,5 @@ red       16384
 black     32768
 
 Example of an entry within resources.config:
-# ID,DMG,lowThreshhold,COLOR,SIDE
-minecraft:stone,0,100,2048,front
+# ID,DMG,lowThreshhold,COLOR,SIDE,PULSE
+minecraft:stone,0,100,2048,front,true
