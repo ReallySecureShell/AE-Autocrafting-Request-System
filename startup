@@ -2,7 +2,7 @@
 -- whenever a new version becomes available.
 
 -- URL for the script.
-local scriptURL = "https://raw.githubusercontent.com/ReallySecureShell/AE-Autocrafting-Request-System/master/startup"
+local scriptURL = "https://raw.githubusercontent.com/ReallySecureShell/AE-Autocrafting-Request-System/master/program/AE-Autocrafting-Request-System.lua"
 
 -- Find the absolute path of the script on the computer.
 local scriptPath = unpack(fs.find("AE-Autocrafting-Request-System.lua"))
