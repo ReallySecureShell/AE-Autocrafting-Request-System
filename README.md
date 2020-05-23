@@ -78,7 +78,7 @@ black     32768
 ```
 
 ### Setting up the ME network
-The computer will output a redstone signal on a specific redstone channel when the item configured for that channel falls below the specified minimum. We connect redstone conduits to the ME export buses to supply them with a redstone signal. The export buses are told to only export when a redstone signal is provided, and to always submit a crafting request when exporting. You will also need to configure the redstone conduits for a specific redstone signal.
+The computer will output a redstone signal on a specific redstone channel when the item configured for that channel falls below the specified minimum. We connect redstone conduits to the ME export buses to supply them with a redstone signal. The export buses are told to only export when a redstone signal is provided, and to always submit a crafting request when exporting. Additionally, each interface along the redstone conduit will need to be configured for a specific redstone channel.
 
 An example of an autocrafting request system:
 <div align="center">
