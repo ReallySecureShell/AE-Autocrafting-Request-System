@@ -7,7 +7,7 @@ However, it should be noted that this system was built within the FTB Infinity E
 
 ## Setup
 ### Installation
-Install the program by copying and pasting the code from `startup` in this repository into the file of the same name on your computer. Relative to the minecraft directory, the location where the in-game files for your computer are stored is `~/minecraft/saves/world_name/computer/num_index_of_computer`. I would tell you to use the `pastebin` command within the computer itself, however it no longer works as the pastebin API has since changed. That said, the startup script serves to automatically update the main script when the `programs/AE-Autocrafting-Request-System.lua` file is edited on the master branch.
+Install the program by copying and pasting the code from `startup` in this repository into the file of the same name on your computer. Relative to the minecraft directory, the location where the in-game files for your computer are stored is `~/minecraft/saves/world_name/computer/num_index_of_computer`. I would tell you to use the `pastebin` command within the computer itself, however it no longer works as the pastebin API has since changed. That said, the startup script serves to automatically update `AE-Autocrafting-Request-System.lua` when `programs/AE-Autocrafting-Request-System.lua` is edited on the master branch.
 
 ### Configuring
 When the program first runs it will generate a configuration file called `resources.config` and ask you to add some enteries.
