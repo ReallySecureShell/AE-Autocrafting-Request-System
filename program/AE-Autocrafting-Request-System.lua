@@ -53,8 +53,6 @@ function loadConfiguration()
 #                 a redstone signal appears to "halt"
 #                 the system.
 #                 This is a boolean.
-#
-# Refer to README.txt for an example.
 # 
 # In-order for the changes in this configuration file to
 # take effect, the system will need to be rebooted.
