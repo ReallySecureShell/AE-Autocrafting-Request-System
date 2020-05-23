@@ -1,0 +1,82 @@
+-- This script auto-updates the AE-Autocrafting-Request-System.lua file 
+-- whenever a new version becomes available.
+
+-- URL for the script.
+local scriptURL = "https://raw.githubusercontent.com/ReallySecureShell/AE-Autocrafting-Request-System/master/startup"
+
+-- Find the absolute path of the script on the computer.
+local scriptPath = unpack(fs.find("AE-Autocrafting-Request-System.lua"))
+
+-- If the path does not exist, replace the scriptPath variable
+-- with the string "null". Otherwise scriptPath will equal a
+-- nil value, which will cause fs.exists to crash the script,
+-- as it wants a string not a nil value.
+if scriptPath == nil then scriptPath = "null" end
+
+-- Check if the URL is accessible. By submitting an HTTP GET request
+-- we can get the webservers response. However, if no internet
+-- connection is present this just returns null. Which is why xpcall()
+-- is being used, since it lets you run another function to handle
+-- errors. In this instance if an error occurs we say that the HTTP
+-- response is a 404.
+local _,response = xpcall(function() 
+						return http.get(scriptURL).getResponseCode()
+						end, function(err)
+						return 404
+						end)
+
+-- If the URL is not accessible, run the script if it exists.
+if response ~= 200 then
+	print('[WARN] Server responded with an HTTP: '..response..'. Cannot check for updates. Will execute the script if already present.')
+	
+	-- Check if the script is present on the computer before we
+	-- try to run it.
+	if fs.exists(scriptPath) then
+		print('[INFO] Script present on system. Executing.')
+		shell.run(scriptPath)
+	else
+		print('[ERROR] AE-Autocrafting-Request-System.lua does not exist on the system.')
+		error()
+	end
+	
+-- Else check if the remote and local versions are the same. 
+-- If so, download the remote version then execute it.
+else
+	if fs.exists(scriptPath)then
+		-- Get all content for the local copy into one variable.
+		compareLocal = fs.open(scriptPath,"r")
+			readAllLocal = compareLocal.readAll()
+		compareLocal.close()
+		
+		-- If both the local and remote versions are the same,
+		-- execute the local copy.
+		if readAllLocal == http.get(scriptURL).readAll() then
+			print('[INFO] '..scriptPath..' is up-to-date.')
+			readAllLocal = nil
+			shell.run(scriptPath)
+			
+		-- If both local and remote versions differ, replace
+		-- the local copy with the remote one.
+		else
+			print('[WARN] '..scriptPath..' is out-of-date. Retrieving updated version from remote repository.')
+			file = io.open(scriptPath,"w")
+			io.output(file)
+				readAllRemote = http.get(scriptURL).readAll()
+				io.write(readAllRemote)
+				readAllRemote = nil
+			io.close()
+			shell.run(scriptPath)
+		end
+		
+	-- If the script doesn't exist on the system. Download it.
+	else
+		print('[INFO] AE-Autocrafting-Request-System.lua does not exist. Downloading it from remote repository.')
+		file = io.open("AE-Autocrafting-Request-System.lua","w")
+		io.output(file)
+			readAllRemote = http.get(scriptURL).readAll()
+			io.write(readAllRemote)
+			readAllRemote = nil
+		io.close()
+		shell.run("AE-Autocrafting-Request-System.lua")
+	end
+end
