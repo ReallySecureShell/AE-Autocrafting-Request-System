@@ -91,7 +91,6 @@ function loadConfiguration()
 	-- Loop through all lines of the configuration file, and append item entries to the monitorItems table.
 	for line in configurationIO:lines() do
 		for id, dmg, lowThreshhold, color, side, pulse in string.gmatch(line,"([a-zA-Z0-9:_.]*),([0-9]*),([0-9]*),([0-9]*),([a-z]*),([a-z]*)") do
-			print("ID:"..id.." DMG:"..dmg.." LOW:"..lowThreshhold.." COLOR:"..color.." SIDE:"..side.." PULSE:"..pulse)
 			-- Convert dmg, lowThreshhold, and color into integers.
 			dmg = tonumber(dmg)
 			lowThreshhold = tonumber(lowThreshhold)
