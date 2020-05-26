@@ -6,11 +6,25 @@ if not AEUplink then
 	error("Computer must be placed next to a part of the AE system.")
 end
 
+-- IMPORTANT TABLES --
+
+-- Initialize table that'll hold the items we want to store.
+monitorItems = {}
+
+-- A table for the item that is currently being targeted. This lets 
+-- allows us to control when a redstone channel is removed from the
+-- side of the computer.
+activeItem = {}
+
+-- Assign some dummy values to avoid an "attempt to index ? (a nil value)" error.
+table.insert(activeItem, 1, { ID="foo",
+							  DMG=1
+							})
+----------------------
+
+
 -- Load the items that we want to monitor.
 function loadConfiguration()
-	-- Initialize table that'll hold the items we want to store.
-	monitorItems = {}
-	
 	-- Check if a disk drive is present.
 	if not fs.isDir("disk/") then
 		configurationName = "resources.config"
@@ -89,7 +103,7 @@ function loadConfiguration()
 			-- Make sure that the value of pulse is either true or false.
 			if pulse == "true" or pulse == "false" then else print('[ERROR] Invalid string: \"'..pulse..'\" for PULSE parameter in configuration.') error() end
 			
-			-- Append index, id, dmg, and lowThreshhold to the monitorItems table as key-value pairs.
+			-- Append id, dmg, lowThreshhold, color, side, and pulse to the monitorItems table as key-value pairs.
 			table.insert(monitorItems, { ID=id,
 										 DMG=dmg,
 										 LOW=lowThreshhold,
@@ -154,24 +168,45 @@ while true do
 		-- Compare the quantity of items from the AE system and the low lowThreshhold value the user provided.
 		-- Emit redstone signal on specified channel color if the quantity of items in the AE system is below
 		-- the threshold value.
-		if itemInAESystem.qty < monitorItems[i].LOW then
-			if monitorItems[i].PULSE == "true" then
-				-- Emit redstone signal to SIDE when item quantity is below threshold. Because of a bug in the 
-				-- 1.7.10 version of AE, which causes the system to essentially halt when supplying a AE cable
-				-- redstone power, so we will sleep a few seconds, then turn the redstone signal off. This will
-				-- effectively create a redstone pulse, which should be long enough for the system to perform
-				-- the desired operation.
+		
+		-- Emit redstone signal to SIDE when item quantity is below threshold. Because of a bug in the 
+		-- 1.7.10 version of AE, which causes the system to essentially halt when supplying a AE cable
+		-- redstone power, so we will sleep a few seconds, then turn the redstone signal off. This will
+		-- effectively create a redstone pulse, which should be long enough for the system to perform
+		-- the desired operation.
+		if monitorItems[i].PULSE == "true" then
+			if itemInAESystem.qty < monitorItems[i].LOW then
 				redstone.setBundledOutput(monitorItems[i].SIDE,colors.combine(redstone.getBundledOutput(monitorItems[i].SIDE),monitorItems[i].COLOR))
 				sleep(5)
 				redstone.setBundledOutput(monitorItems[i].SIDE,colors.subtract(redstone.getBundledOutput(monitorItems[i].SIDE),monitorItems[i].COLOR))
-			-- If we are directed to not pulse the signal, keep the signal on until the quantity of the monitored
-			-- item exceeds the LOW value.
-			elseif monitorItems[i].PULSE == "false" then
-				redstone.setBundledOutput(monitorItems[i].SIDE,colors.combine(redstone.getBundledOutput(monitorItems[i].SIDE),monitorItems[i].COLOR))
 			end
-		-- If the AE system contains more than the LOW quantity, and if we weren't directed to PULSE, disable the redstone signal for the item.
-		elseif itemInAESystem.qty > monitorItems[i].LOW and monitorItems[i].PULSE == "false" then
-			redstone.setBundledOutput(monitorItems[i].SIDE,colors.subtract(redstone.getBundledOutput(monitorItems[i].SIDE),monitorItems[i].COLOR))
+		
+		-- If we weren't directed to pulse, then create start adding items to their respective redstone 
+		-- channels. However, no more than one item can ever be assigned to one channel at a time.
+		elseif monitorItems[i].PULSE == "false" then
+			-- If the color from monitorItems[i].COLOR has NOT been assigned to monitorItems[i].SIDE,
+			-- then assign the color to the side. This will create a queue for items that are configured
+			-- for the same redstone channel.
+			if not redstone.testBundledInput(monitorItems[i].SIDE,monitorItems[i].COLOR) then
+				if itemInAESystem.qty < monitorItems[i].LOW then
+					print("Added item: "..monitorItems[i].ID) -- Temp
+					redstone.setBundledOutput(monitorItems[i].SIDE,colors.combine(redstone.getBundledOutput(monitorItems[i].SIDE),monitorItems[i].COLOR))
+					
+					-- Populate the activeItem table with the item currently being targeted.
+					table.insert(activeItem, 1, { ID=monitorItems[i].ID,
+												  DMG=monitorItems[i].DMG
+												})
+				end
+			
+			-- If the channel color has been assigned to the side, see if the item quantities are
+			-- above the threshold. If they are, then remove the channel.
+			elseif redstone.testBundledInput(monitorItems[i].SIDE,monitorItems[i].COLOR) and activeItem[1].ID == monitorItems[i].ID and activeItem[1].DMG == monitorItems[i].DMG then
+				-- If above threshold, remove the channel from the side.
+				if itemInAESystem.qty > monitorItems[i].LOW then
+					print("Removing item: "..monitorItems[i].ID) -- Temp
+					redstone.setBundledOutput(monitorItems[i].SIDE,colors.subtract(redstone.getBundledOutput(monitorItems[i].SIDE),monitorItems[i].COLOR))
+				end
+			end
 		end
 	end
 	sleep(5)
