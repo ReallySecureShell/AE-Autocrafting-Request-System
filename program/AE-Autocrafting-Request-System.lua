@@ -15,8 +15,14 @@ end
 -- AE system is being provided with RF or EU power. The getMaxStoredPower is
 -- RF and getMaxEnergyStored is EU.
 if AEUplink.getMaxStoredPower() == 0 and AEUplink.getMaxEnergyStored() == 0 then
-	print('[ERROR] The AE system is not being supplied with RF or EU power.')
-	error()
+	print('[WARN] The AE system is not being supplied with RF or EU power. Waiting for AE system to come online.')
+	while true do
+		if AEUplink.getMaxStoredPower() == 0 and AEUplink.getMaxEnergyStored() == 0 then
+		else
+			break
+		end
+		sleep(10)
+	end
 end
 
 ---------------------
