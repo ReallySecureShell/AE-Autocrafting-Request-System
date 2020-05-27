@@ -1,27 +1,45 @@
 -- Find and automatically connect to the AE network when placed beside an ME cable.
 AEUplink = peripheral.find("aemultipart")
 
+-- POWER-ON SELF-TEST
+
 -- If an AE system is not found, exit with an error.
 if not AEUplink then
-	error("Computer must be placed next to a part of the AE system.")
+	print('[ERROR] Computer must be placed next to a part of the AE system.')
+	error()
 end
 
--- IMPORTANT TABLES --
+-- Check if we can pull information from the AE system. These checks will have
+-- to be performed later as well, as a sudden loss in AE connectivity will
+-- cause the game to crash. In this instance we will just check to see if the
+-- AE system is being provided with RF or EU power. The getMaxStoredPower is
+-- RF and getMaxEnergyStored is EU.
+if AEUplink.getMaxStoredPower() == 0 and AEUplink.getMaxEnergyStored() == 0 then
+	print('[ERROR] The AE system is not being supplied with RF or EU power.')
+	error()
+end
+
+---------------------
+
+-- PRE-SETUP --
+
+-- Remove redstone signal on all sides.
+for _, side in pairs(peripheral.getNames()) do
+	if peripheral.getType(side) == "blockconduitbundletileentity" then
+		redstone.setBundledOutput(side,0)
+	end
+end
 
 -- Initialize table that'll hold the items we want to store.
 monitorItems = {}
+
 
 -- A table for the item that is currently being targeted. This lets 
 -- allows us to control when a redstone channel is removed from the
 -- side of the computer.
 activeItem = {}
 
--- Assign some dummy values to avoid an "attempt to index ? (a nil value)" error.
-table.insert(activeItem, 1, { ID="foo",
-							  DMG=1
-							})
-----------------------
-
+---------------------
 
 -- Load the items that we want to monitor.
 function loadConfiguration()
@@ -186,27 +204,30 @@ while true do
 			-- If the color from monitorItems[i].COLOR has NOT been assigned to monitorItems[i].SIDE,
 			-- then assign the color to the side. This will create a queue for items that are configured
 			-- for the same redstone channel.
-			if not redstone.testBundledInput(monitorItems[i].SIDE,monitorItems[i].COLOR) then
-				if itemInAESystem.qty < monitorItems[i].LOW then
-					print("Added item: "..monitorItems[i].ID) -- Temp
+			if itemInAESystem.qty < monitorItems[i].LOW then
+				if not redstone.testBundledInput(monitorItems[i].SIDE,monitorItems[i].COLOR) then
 					redstone.setBundledOutput(monitorItems[i].SIDE,colors.combine(redstone.getBundledOutput(monitorItems[i].SIDE),monitorItems[i].COLOR))
-					
-					-- Populate the activeItem table with the item currently being targeted.
-					table.insert(activeItem, 1, { ID=monitorItems[i].ID,
-												  DMG=monitorItems[i].DMG
-												})
+					table.insert(activeItem, { ID=monitorItems[i].ID,
+											   DMG=monitorItems[i].DMG,
+											   LOW=monitorItems[i].LOW,
+											   COLOR=monitorItems[i].COLOR,
+											   SIDE=monitorItems[i].SIDE
+											})
 				end
+			end
 			
-			-- If the channel color has been assigned to the side, see if the item quantities are
-			-- above the threshold. If they are, then remove the channel.
-			elseif redstone.testBundledInput(monitorItems[i].SIDE,monitorItems[i].COLOR) and activeItem[1].ID == monitorItems[i].ID and activeItem[1].DMG == monitorItems[i].DMG then
-				-- If above threshold, remove the channel from the side.
-				if itemInAESystem.qty > monitorItems[i].LOW then
-					print("Removing item: "..monitorItems[i].ID) -- Temp
-					redstone.setBundledOutput(monitorItems[i].SIDE,colors.subtract(redstone.getBundledOutput(monitorItems[i].SIDE),monitorItems[i].COLOR))
+			if #activeItem ~= 0 then
+				for activeItemIndex,_ in pairs(activeItem) do
+					if activeItem[activeItemIndex].ID == itemInAESystem.id and activeItem[activeItemIndex].DMG == itemInAESystem.dmg then
+						if itemInAESystem.qty > activeItem[activeItemIndex].LOW then
+							redstone.setBundledOutput(monitorItems[i].SIDE,colors.subtract(redstone.getBundledOutput(monitorItems[i].SIDE),monitorItems[i].COLOR))
+							table.remove(activeItem,activeItemIndex)
+							break
+						end
+					end
 				end
 			end
 		end
+		sleep(1)
 	end
-	sleep(5)
 end
