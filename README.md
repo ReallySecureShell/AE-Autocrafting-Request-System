@@ -26,9 +26,9 @@ io.close()
 Now restart the computer and the startup script will download the main script.
 
 ### Configuring
-When the program first runs it will generate a configuration file called `resources.config` and ask you to add some enteries.
-The configuration can look a little complex so I'll provide an example.
+When the script first executes it will generate a configuration file `resources.config` (or `disk/resources.config` if a disk-drive is present) and ask you to add some enteries.
 
+The configuration can look a little complex, so I'll use one of my configurations as an example:
 ```
 # ID,DMG,lowThreshhold,COLOR,SIDE,PULSE
 #
