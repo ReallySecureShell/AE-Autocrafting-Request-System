@@ -114,26 +114,29 @@ function loadConfiguration()
 	
 	-- Loop through all lines of the configuration file, and append item entries to the monitorItems table.
 	for line in configurationIO:lines() do
-		for id, dmg, lowThreshhold, color, side, pulse in string.gmatch(line,"([a-zA-Z0-9:_.]*),([0-9]*),([0-9]*),([0-9]*),([a-z]*),([a-z]*)") do
-			-- Convert dmg, lowThreshhold, and color into integers.
-			dmg = tonumber(dmg)
-			lowThreshhold = tonumber(lowThreshhold)
-			color = tonumber(color)
+		for id, dmg, lowThreshhold, color, side, pulse in string.gmatch(line,"([a-zA-Z0-9:_.#]*),([0-9]*),([0-9]*),([0-9]*),([a-z]*),([a-z]*)") do
 			
-			-- Check to make sure the side provided is one of six sides.
-			if side == "front" or side == "back" or side == "left" or side == "right" or side == "top" or side == "bottom" then else print('[ERROR] Invalid side \"'..side..'\"') error() end
-			
-			-- Make sure that the value of pulse is either true or false.
-			if pulse == "true" or pulse == "false" then else print('[ERROR] Invalid string: \"'..pulse..'\" for PULSE parameter in configuration.') error() end
-			
-			-- Append id, dmg, lowThreshhold, color, side, and pulse to the monitorItems table as key-value pairs.
-			table.insert(monitorItems, { ID=id,
-										 DMG=dmg,
-										 LOW=lowThreshhold,
-										 COLOR=color,
-										 SIDE=side,
-										 PULSE=pulse
-										})
+			if string.sub(id,1,1) ~= "#" then
+				-- Convert dmg, lowThreshhold, and color into integers.
+				dmg = tonumber(dmg)
+				lowThreshhold = tonumber(lowThreshhold)
+				color = tonumber(color)
+				
+				-- Check to make sure the side provided is one of six sides.
+				if side == "front" or side == "back" or side == "left" or side == "right" or side == "top" or side == "bottom" then else print('[ERROR] Invalid side \"'..side..'\"') error() end
+				
+				-- Make sure that the value of pulse is either true or false.
+				if pulse == "true" or pulse == "false" then else print('[ERROR] Invalid string: \"'..pulse..'\" for PULSE parameter in configuration.') error() end
+				
+				-- Append id, dmg, lowThreshhold, color, side, and pulse to the monitorItems table as key-value pairs.
+				table.insert(monitorItems, { ID=id,
+											DMG=dmg,
+											LOW=lowThreshhold,
+											COLOR=color,
+											SIDE=side,
+											PULSE=pulse
+											})
+			end
 		end
 	end
 	
