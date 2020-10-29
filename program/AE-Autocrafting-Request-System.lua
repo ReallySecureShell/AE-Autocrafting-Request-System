@@ -9,19 +9,34 @@ if not AEUplink then
 	error()
 end
 
+-- Reset the redstone signal on all sides of the computer.
+function resetRedstoneSignal()
+	for _, side in pairs(peripheral.getNames()) do
+		if peripheral.getType(side) == "blockconduitbundletileentity" then
+			redstone.setBundledOutput(side,0)
+		end
+	end
+end
+
 -- Check if we can pull information from the AE system. These checks will have
 -- to be performed later as well, as a sudden loss in AE connectivity will
 -- cause the game to crash. In this instance we will just check to see if the
 -- AE system is being provided with RF or EU power. The getMaxStoredPower is
 -- RF and getMaxEnergyStored is EU.
-if AEUplink.getMaxStoredPower() == 0 and AEUplink.getMaxEnergyStored() == 0 then
-	print('[WARN] The AE system is not being supplied with RF or EU power. Waiting for AE system to come online.')
-	while true do
-		if AEUplink.getMaxStoredPower() == 0 and AEUplink.getMaxEnergyStored() == 0 then
-		else
-			break
+function haltUntilAESystemOnline()
+	if AEUplink.getMaxStoredPower() == 0 and AEUplink.getMaxEnergyStored() == 0 then
+		print('[WARN] The AE system is not being supplied with power. Waiting for AE system to come online.')
+
+		resetRedstoneSignal()
+
+		while true do
+			if AEUplink.getMaxStoredPower() == 0 and AEUplink.getMaxEnergyStored() == 0 then
+			else
+				print('[INFO] AE system online. Resuming normal execution...')
+				break
+			end
+			sleep(10)
 		end
-		sleep(10)
 	end
 end
 
@@ -29,16 +44,10 @@ end
 
 -- PRE-SETUP --
 
--- Remove redstone signal on all sides.
-for _, side in pairs(peripheral.getNames()) do
-	if peripheral.getType(side) == "blockconduitbundletileentity" then
-		redstone.setBundledOutput(side,0)
-	end
-end
+resetRedstoneSignal()
 
 -- Initialize table that'll hold the items we want to store.
 monitorItems = {}
-
 
 -- A table for the item that is currently being targeted. This lets 
 -- allows us to control when a redstone channel is removed from the
@@ -155,6 +164,10 @@ loadConfiguration()
 print('Executing...')
 -- Main program loop
 while true do
+	-- Incase the computer loses connection to the AE network, or the AE system 
+	-- loses power. Halt the script until connection and/or power is restored.
+	haltUntilAESystemOnline()
+
 	for i=1,#monitorItems do
 		-- Attempt to set the itemInAESystem variable. If it fails the status will be false, and the actual exception thrown will be returned.
 		-- If the below code does not throw an exception, the itemInAESystem variable is set normally.
